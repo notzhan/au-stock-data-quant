@@ -2,8 +2,10 @@ results.tsv
 __pycache__/
 *.bak.*
 venv/
+.venv/
 __pycache__/
 *.pyc
 cache/
 test-prompts.json
 html/
+.env

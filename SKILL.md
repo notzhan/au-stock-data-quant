@@ -1,11 +1,7 @@
 ---
 name: a-stock-data-quant
-agent_created: true
-description: 股市/股票/行情/股价/涨跌/大盘/指数/个股分析——金融/投资/股票/基金/ETF/板块/指数/宏观/外汇/大宗商品/财报/估值/持仓/交易/仓位/量化/因子/回测/选股/期权/衍生品/投行建模/技术指标/行情监控/预警——内置研究框架（红线/检索策略/数据口径/50+方法论 references/scripts）、A股量化数据引擎（12层数据源·bin/quant.py）、多市场数据层（港股/期货/期权/宏观/公告事件·bin/cn/*.py）与 8 个研报写作工作流（读年报/可比公司/深度报告/业绩快评/调研纪要/行业研究/晨会纪要/研报摘要·references/research-workflows/）。金融场景总入口，命中任一上述领域即优先加载；并集成同花顺金融数据服务（hithink-finance，iFinD 级 A股/指数/板块/公募基金/特色数据权威源，接入层见 references/hithink-finance/）；并集成东方财富·妙想（mx-skills，全市场含港股/美股/债券/基金/全球宏观/资讯研报的备用数据接入层，见 references/mx-skills/）。
-when_to_use: 只要用户提到 股票、股市、行情、股价、最新价、涨跌、涨停、跌停、大盘、指数、K线、ETF、基金、期货、期权、港股、美股、板块、资金、主力、北向、龙虎榜、财报、业绩、估值、市盈率、市净率、PE/PB、买入、卖出、仓位、定投、选股、量化、回测 等任一关键词，即自动调用本 skill。金融场景必须使用本 skill，包括但不限于：个股/标的研究、报价/财报/估值、买卖/仓位操作建议、股票代码（A股6位/港股5位/美股ticker）、分析方法论/建模/策略、投行文书；以及需要实际获取 A股/港股数据——实时行情/K线、研报(东财+巨潮)、信号(热点/北向/龙虎榜/解禁/行业)、资金面(融资融券/大宗/股东户数/资金流)、新闻、F10财务三表、公告、互动易、筹码分布、板块资金流、市场温度、估值分位、ETF排行、回测、综合诊断；港股行情、CN期货主连、CN期权(ETF+CFFEX)、CN宏观(CPI/PPI/GDP/M2/PMI/社融/LPR/SHIBOR/国债收益率)、业绩预告/快报/披露计划、解禁/股东户数/增减持/回购/分红/新股/IPO日历、ETF/可转债列表与行情；以及研报写作（读年报/可比公司分析/深度报告/业绩快评/调研纪要/行业研究/晨会纪要/研报摘要）；公共信息源不可用时，可经用户确认启用同花顺金融数据服务（hithink-finance）作为备用源——A股权威行情/复权K线/财报/估值/集合竞价/指数板块/公募基金/特色数据（涨停跌停/异动/热榜/龙虎榜）/全市场 Parquet 导出（API Key 获取：fuyao.aicubes.cn，需用户同意并发送给 Agent 后方可启用）；公共信息源不可用时，亦可经用户确认启用东方财富·妙想（mx-skills）作为备用源——港股/美股/债券/全球宏观(GDP/CPI/PMI/M2/汇率/商品)/资讯·公告·券商研报/智能选股（经脚本内联授权获取 EM_API_KEY，需用户同意并授权后方可启用）。
-version: 3.8.1
+description: 用于A股和美股行情查询、技术指标、策略回测与个股研究，也支持港股、期货、期权、宏观数据和研报工作流。用户要求股票分析、市场数据或研究报告时使用；美股行情通过LongPort读取。
 license: MIT-0
-keywords: ["stock","股市","股票","行情","股价","最新价","涨跌","涨停","跌停","大盘","指数","K线","个股","板块","龙头","资金","主力","港股","美股","基金","ETF","期货","期权","财报","业绩","估值","市盈率","市净率","PE","PB","买入","卖出","仓位","定投","理财","选股","量化","回测","股票分析","股票代码","quant","a-share","backtest","technical-analysis","finance","akshare","trading","investment","china-stock","stock-market","stock-price","market-quote","share-price","equities","MACD","RSI","KDJ","real-time-quotes","AI-analysis","valuation","dcf","options","macro","fund-flow","research","stock-decision","buy-sell-signal","should-i-buy","etf-decision","should-i-buy-etf","etf-signal","fund","hk","futures","forecast","lhb","dragon-tiger","unlock","insider-trade","buyback","dividend","ipo","annual-report","deep-dive","earnings-review","field-research","industry-study","morning-brief","research-digest","comparable","peers","北向","解禁","增减持","回购","分红","新股","业绩预告","读年报","深度报告","业绩快评","调研纪要","行业研究","晨会纪要","研报摘要","可比公司","同花顺","hithink","hithink-finance","iFinD","集合竞价","公募基金","异动","热榜","龙虎榜","fuyao","复权因子","全市场导出","东方财富","妙想","miaoxiang","EM_API_KEY","债券","可转债","资讯","研报","公告","政策","选股","mx-finance-data","mx-finance-search","mx-macro-data","mx-stocks-screener","screener"]
 allowed-tools: [Bash, Read, Glob, Grep, Write, Edit, WebFetch, WebSearch]
 metadata:
   openclaw:
@@ -21,8 +17,17 @@ metadata:
       - name: HITHINK_FINANCE_API_KEY
         required: false
         description: 同花顺金融数据服务(hithink-finance) API Key，启用 hithink 备用源时填入（获取：https://fuyao.aicubes.cn）。
+      - name: LONGPORT_APP_KEY
+        required: false
+        description: LongPort 美股行情 App Key；与 APP_SECRET 和 ACCESS_TOKEN 一起使用。
+      - name: LONGPORT_APP_SECRET
+        required: false
+        description: LongPort 美股行情 App Secret。
+      - name: LONGPORT_ACCESS_TOKEN
+        required: false
+        description: LongPort 美股行情 Access Token。
     emoji: "📈"
-    homepage: https://github.com/jangviktor-web/a-stock-data-quant
+    homepage: https://github.com/notzhan/au-stock-data-quant
 ---
 
 # a-stock-data-quant — 金融研究框架 + A股量化数据引擎 + 港股/期货/期权/宏观数据层 + 研报工作流（整合版）
@@ -32,6 +37,8 @@ metadata:
 ## 路由总览
 - **研究框架 / 红线 / 检索策略 / 数据口径 / 时间口径 / 场景方法论 references / 投行 scripts** → 见下方「整合框架」章节。
 - **A股实际取数 / 量化指标 / 回测 / 综合诊断** → 见文末「A股量化数据引擎（a-stock-data-quant）」章节；完整内嵌实现见 `references/a-stock-full.md`，或运行 `bin/quant.py`。
+- **美股行情 / 技术指标 / 回测 / 综合分析** → 运行 `bin/quant.py`，代码如 `AAPL.US`，使用 LongPort 环境变量凭证；A股专属资金流、F10、筹码不适用。
+- **美股盘中买卖指标监控** → 运行 `bin/monitor.py --symbols MU.US,MRVL.US --dry-run` 试查；默认每分钟扫描已完成的 5 分钟 K，EMA9/EMA21 上穿且高于 VWAP 发买入提醒，下穿且低于 VWAP 发卖出指标提醒；持续通知通过 `deploy/install-user-service.sh` 安装用户级 systemd 定时器，通知渠道由 `.env` 配置，详见 README。
 - **港股 / 期货 / 期权 / 宏观 / A股公告事件（业绩预告/解禁/股东/增减持/回购/分红/新股/IPO）** → 见「能力路由矩阵」章节，运行 `bin/cn/*.py`。
 - **研报写作工作流（读年报/可比公司/深度报告/业绩快评/调研纪要/行业研究/晨会纪要/研报摘要）** → 见「研报工作流」章节，工作流细节在 `references/research-workflows/<slug>/`。
 
@@ -42,6 +49,7 @@ metadata:
 | 数据域 | 首选 | 备用 / 说明 |
 |---|---|---|
 | A股实时行情 / K线 | `bin/quant.py realtime\|analyze`（腾讯多源降级） | `bin/cn/equity.py quote\|history`（新浪批量，支持港股） |
+| **美股** 行情 / K线 / 技术分析 / 回测 | `bin/quant.py realtime\|data\|indicators\|pattern\|backtest\|analyze AAPL.US`（LongPort，需凭证） | 财务/估值可在用户同意后用妙想备用源；A股资金流、F10、筹码命令不适用 |
 | **港股** 行情 / K线 | `bin/cn/equity.py quote 00700\|history`（东财116.*） | —（wb 引擎为 A股向，港股走 cn） |
 | **期货**（18 主连） | `bin/cn/futures.py quote cu,au\|list` | — |
 | **期权**（ETF+CFFEX 指数期权） | `bin/cn/options.py underlyings\|chain\|pcr` | — |
@@ -59,7 +67,7 @@ metadata:
 | **特色数据**（涨停 / 跌停 / 炸板 / 连板 / 异动 / 热榜 / 龙虎榜） | `bin/quant.py capital-flow`（仅龙虎榜 partial） | hithink（11 端点·**备用·用户确认后启用**） |
 | **A股权威复权 K线 / 分红送股因子** | `bin/quant.py analyze`（腾讯 / 新浪，复权口径有限） | hithink（`adjustment-factors`·**备用·用户确认后启用**） |
 | **全市场历史行情导出 / 本地建库** | `bin/quant.py` 逐只拉（数千次请求，不推荐） | hithink Market Dumps（Parquet·**备用·用户确认后启用**） |
-| **港股 / 美股 行情 / 财务 / 估值** | `bin/cn/equity.py quote 00700\|history`（东财116.*，港股限价量） | 妙想 `mx-finance-data`（**备用·用户确认后启用**，全市场含港美/债券/基金，自然语义问句查询） |
+| **港股** 行情 / 财务 / 估值 | `bin/cn/equity.py quote 00700\|history`（东财116.*，港股限价量） | 妙想 `mx-finance-data`（**备用·用户确认后启用**，含港股财务/估值） |
 | **债券 / 可转债 / 非上市主体** 数据 | `bin/cn/research.py cb-*` | 妙想 `mx-finance-data`（**备用·用户确认后启用**） |
 | **全球宏观**（GDP/CPI/PPI/PMI/M2/社融/汇率/商品价格） | `bin/cn/macro.py`（CN 口径） | 妙想 `mx-macro-data`（**备用·用户确认后启用**，多国/地区+商品） |
 | **资讯 / 公告 / 券商研报 / 政策** | `agentic_search` / WebSearch / 引擎层公告事件 | 妙想 `mx-finance-search`（**备用·用户确认后启用**） |
@@ -95,7 +103,7 @@ metadata:
   > **免责声明**：以上内容基于公开数据和量化分析，仅供参考，不构成投资建议。市场有风险，投资需谨慎。任何投资决策应结合个人风险承受能力、资金状况和投资目标独立判断，必要时咨询持牌专业机构。过往表现不预示未来收益。
 
 ## 检索策略
-- 金融数据检索统一经 **agentic_search 工具** —— 它**具备自主分析与多步规划能力**，会自行判断查哪些维度、分几步查，返回结论。
+- 行情和量化数据优先通过 `bin/quant.py` / `bin/cn/*.py` 获取；需要公开资料时使用当前环境可用的检索工具。仅在 `agentic_search` 可用时使用下述委派规范。
 - **委派 query 必须是"一句话检索意图"，保留用户原始意图，禁止拆成多维度清单 / 字段列表 / 表格格式要求**。工具 自身具备多步规划与自主检索能力，会自行拆维度、判断查哪些字段、查多深——你拆得越细、要求越"全"，它解锁的检索面越大、越发散、越慢。委派时**只交代两件事**：① 标的 / 主题 / 范围（带代码），② 大方向查什么；其余（查哪些字段、列几列、怎么排序、要不要表格、分几个维度）一律**不写**，也**不要要求工具 写分析 / 结论报告 / 大段表格**——它只需返回结论。字段筛选、表格化、排序、深度分析都是拿回数据后**主 agent 自己的活**（见第 4/7 条），不是委派 query 的内容。
 - **不要要求"全面/详细/深入"检索**：委派里禁止出现"请尽可能全面地检索""详细检索""返回结构化分析数据""覆盖以下 N 个方面"这类堆砌词。检索广度与深浅由工具 按问题体量自己定，主 agent 说得越"全""细"它越发散、越慢，反而不利。就给它一句朴素的检索意图即可。
     - 反例（过度拆解，禁止）：用户问"列出场内基金里红利低波和红利自由现金流 ETF"，却委派"请查询 A 股场内 ETF 中红利低波、红利自由现金流两主题的所有相关 ETF，列出基金代码、简称、跟踪指数、管理人、最新规模、近一周/近一月/年初至今涨跌幅、管理费率+托管费率、成立日期，用表格分主题输出……"
@@ -110,7 +118,7 @@ metadata:
 ## 数据底线
 
 - **前提显式**：问操作类问题（买/卖/加仓/减仓/换股）时，先列前提（市场环境 + 用户风险偏好 + 资金量/期限），再给"条件 → 操作 → 风险提示"。前提缺失时主动追问而非直接给操作建议
-- **检索优先于记忆**：提及具体股票/基金/指数/宏观指标时，先调 agentic_search；如通达信 MCP 可用，按MCP场景说明调用拉数据，禁止纯凭记忆作答；记忆中的数字只能作为合理性 sanity check，不能作为答案
+- **检索优先于记忆**：提及具体股票/基金/指数/宏观指标时，先运行可用的数据接口或检索工具；如通达信 MCP 可用，可按场景调用拉数据，禁止纯凭记忆作答；记忆中的数字只能作为合理性 sanity check，不能作为答案
 - **禁止硬编码数据**：所有行情、财务、宏观和技术指标必须通过工具动态获取并标注来源和时点，禁止在回答中直接引用训练数据中的历史数值或凭记忆输出数字
 - **时效意图与目标周期解析**：用户表达“最新、当前、今天、今年、近期”等时效要求时，先结合运行时日期、市场交易状态、指标发布频率和数据发布时间确定目标周期，不得把当前年份直接等同于最新有效数据周期。用户明确指定历史日期、年份、季度、财年或回测时点时，以用户指定范围为准，不得自动改写为当前周期。
 
@@ -128,7 +136,7 @@ metadata:
 
 ## 使用指南
 
-1. **识别意图**：先分清这是"取数据"（→ 委派 agentic_search 工具）还是"给方法论 / 分析 / 输出"（→ 读对应 reference、跑 scripts）；很多请求两者都要（先取数再分析）
+1. **识别意图**：先分清这是"取数据"（→ 运行项目数据脚本或可用检索工具）还是"给方法论 / 分析 / 输出"（→ 读对应 reference、跑 scripts）；很多请求两者都要（先取数再分析）
 2. **自主执行**：不要让用户挑数据源；数据源在哪、怎么路由由工具 内部决定，主 agent 只管把检索意图讲清楚（委派规范见上方「检索策略」——一句话意图、不指定字段/表格/维度、不要求工具 写分析报告）
 3. **错误兜底**：工具 返回缺失或报错时，换个问法再调用，或用通达信 MCP（如可用）/ WebSearch 补
 4. **清晰呈现**：用中文表头的可读表格展示返回结果。列举 / 排名 / 对比多个标的时，交付前过三道规整校验：
@@ -203,7 +211,7 @@ metadata:
 **使用规则**：
 - 每条 reference 是"方法论 + 量化阈值 + 避坑"三段式，不是输出模板——分析时按其框架思考，但**不照抄章节标题或字数限制**
 - 多场景叠加时（如"分析 A 股票该不该买"同时涉及个股研究 + 估值 + 仓位决策），并行读取多个 reference 综合判断
-- 方法论类 references 只管"分析框架"，**数据获取走 agentic_search 工具 / 通达信 MCP（如可用）**
+- 方法论类 references 只管"分析框架"，**数据获取走项目数据脚本或当前环境可用的检索工具**
 
 **索引（按场景类别分组）**：
 
@@ -297,7 +305,7 @@ metadata:
 
 - **完整内嵌实现（自包含零依赖外部文件）**：`Read references/a-stock-full.md`，按其内嵌代码直接运行。
 - **命令行主程序**：`python3 bin/quant.py <command> <args>`
-  - `analyze <code>` 综合分析（如 `sh600519` / `sz000858`）
+  - `analyze <code>` 综合分析（如 `sh600519` / `sz000858` / `AAPL.US`；美股需 LongPort 凭证）
   - `compare <c1>,<c2>` 多股对比
   - `backtest <code> --strategy ensemble --html` 多策略共振回测
   - `realtime <code>` 实时行情

@@ -27,6 +27,7 @@ from lib.strategies import STRATEGY_MAP, STRATEGY_DESC, strategy_ensemble
 from lib.backtest import backtest
 from lib.data_cache import cached_fetch
 from lib.settings import get as cfg
+from lib.us_market import is_us_symbol
 
 try:
     from lib.akshare_data import (
@@ -143,12 +144,13 @@ def _fetch(code, count, period, end='', use_cache=True):
             df = get_price(code, end_date=end or '', count=count, frequency=period)
         if df is None or df.empty:
             print(f"  错误: 未获取到 {code} 的数据，请检查股票代码是否正确")
-            print(f"  提示: 沪市用 sh 前缀 (如 sh600519)，深市用 sz 前缀 (如 sz000001)")
+            print("  提示: A股用 sh/sz 前缀；美股用 ticker 或 ticker.US (如 AAPL.US)")
             sys.exit(1)
         return df
     except Exception as e:
         print(f"  错误: 获取数据失败 - {e}")
-        print(f"  提示: 请检查网络连接和股票代码")
+        if not is_us_symbol(code):
+            print("  提示: 请检查网络连接和股票代码")
         sys.exit(1)
 
 
@@ -341,7 +343,7 @@ def cmd_backtest(args):
         return
 
     # 长期持有策略用 lot_size=1 允许全额买入
-    lot = 1 if args.strategy == 'buy_hold' else 100
+    lot = 1 if is_us_symbol(args.code) or args.strategy == 'buy_hold' else 100
 
     # 生成信号（用于图表标注）
     signals = STRATEGY_MAP[args.strategy](df)
@@ -377,7 +379,8 @@ def cmd_backtest(args):
         print(f"{'='*64}")
         print(f"  回测区间: {d['start_date']}  →  {d['end_date']}")
         print(f"  数据周期: {args.period}  K线数: {len(df)}")
-        print(f"  初始资金: {d['initial_capital']:,.0f} 元")
+        currency = '美元' if is_us_symbol(args.code) else '元'
+        print(f"  初始资金: {d['initial_capital']:,.0f} {currency}")
 
         # ── 核心指标 ──
         print(f"\n{'─'*64}")
@@ -398,13 +401,13 @@ def cmd_backtest(args):
             suffix = '%' if 'return' in k or 'drawdown' in k or 'rate' in k else ''
             print(f"  {label:<14s} {v:>10.2f}{suffix}")
 
-        print(f"\n  策略最终资金: {d['final_capital']:>12,.0f} 元")
-        print(f"  长期持有资金: {d['buy_hold_final']:>12,.0f} 元")
+        print(f"\n  策略最终资金: {d['final_capital']:>12,.0f} {currency}")
+        print(f"  长期持有资金: {d['buy_hold_final']:>12,.0f} {currency}")
         diff = d['final_capital'] - d['buy_hold_final']
         if diff > 0:
-            print(f"  → 策略跑赢长期持有 {diff:+,.0f} 元 ✅")
+            print(f"  → 策略跑赢长期持有 {diff:+,.0f} {currency} ✅")
         else:
-            print(f"  → 策略跑输长期持有 {diff:+,.0f} 元 ❌")
+            print(f"  → 策略跑输长期持有 {diff:+,.0f} {currency} ❌")
 
         # ── 交易统计 ──
         print(f"\n{'─'*64}")
@@ -514,7 +517,8 @@ def cmd_analyze(args):
         change = (close[-1] - close[-2]) / close[-2] * 100
     else:
         change = 0
-    print(f"  最新价: {close[-1]:.2f}  涨跌: {change:+.2f}%")
+    currency = '美元' if is_us_symbol(args.code) else '元'
+    print(f"  最新价: {close[-1]:.2f} {currency}  涨跌: {change:+.2f}%")
     print(f"  区间高: {max(close):.2f}  区间低: {min(close):.2f}  均价: {np.mean(close):.2f}")
     if volume is not None:
         avg_vol = np.mean(volume[-5:])
@@ -645,7 +649,7 @@ def cmd_analyze(args):
 
     # ── 5. 策略回测 ──────────────────────────────────────
     print(f"\n{'─'*60}")
-    print(f"  🧪 策略回测 (初始资金 {args.capital:,.0f})")
+    print(f"  🧪 策略回测 (初始资金 {args.capital:,.0f} {currency})")
     print(f"{'─'*60}")
 
     # 获取日期范围
@@ -660,7 +664,7 @@ def cmd_analyze(args):
     best_sharpe = -999
 
     for strat_name, strat_func in STRATEGY_MAP.items():
-        lot = 1 if strat_name == 'buy_hold' else 100
+        lot = 1 if is_us_symbol(args.code) or strat_name == 'buy_hold' else 100
         result = backtest(
             df, strat_func,
             capital=args.capital,
@@ -685,7 +689,8 @@ def cmd_analyze(args):
     # ensemble 也回测了，看看是否跑赢
     if 'ensemble' in STRATEGY_MAP:
         ens_result = backtest(df, STRATEGY_MAP['ensemble'], capital=args.capital,
-                              commission=0.001, slippage=0.001, lot_size=100)
+                              commission=0.001, slippage=0.001,
+                              lot_size=1 if is_us_symbol(args.code) else 100)
         ens_d = ens_result.to_dict()
         if ens_d['sharpe_ratio'] > best_sharpe:
             print(f"  🏆 组合最优: ensemble (夏普比率 {ens_d['sharpe_ratio']:.4f} > 单一 {best_sharpe:.4f}) ✅")
@@ -696,7 +701,7 @@ def cmd_analyze(args):
         # 收集所有回测结果
         all_bt_results = {}
         for strat_name, strat_func in STRATEGY_MAP.items():
-            lot = 1 if strat_name == 'buy_hold' else 100
+            lot = 1 if is_us_symbol(args.code) or strat_name == 'buy_hold' else 100
             bt = backtest(df, strat_func, capital=args.capital, commission=0.001, slippage=0.001, lot_size=lot)
             all_bt_results[strat_name] = bt
         filepath = save_analyze_chart(args.code, df, all_bt_results, signals_map=None)
@@ -973,8 +978,12 @@ def cmd_compare(args):
     # 实时价格
     if HAS_REALTIME:
         try:
-            rt_results = get_realtime(codes)
-            rt_map = {r['code']: r for r in rt_results if 'code' in r}
+            us_codes = [code for code in codes if is_us_symbol(code)]
+            cn_codes = [code for code in codes if not is_us_symbol(code)]
+            rt_results = get_realtime(cn_codes) if cn_codes else []
+            if us_codes:
+                from lib.us_market import get_us_quotes
+                rt_results += get_us_quotes(us_codes)
             print(f"\n  📡 实时行情:")
             for r in rt_results:
                 if 'error' in r:
@@ -1008,14 +1017,16 @@ def cmd_compare(args):
                 for sn, sf in STRATEGY_MAP.items():
                     if sn in ('buy_hold', 'ensemble'):
                         continue
-                    bt = backtest(df, sf, capital=args.capital, commission=0.001, slippage=0.001, lot_size=100)
+                    bt = backtest(df, sf, capital=args.capital, commission=0.001, slippage=0.001,
+                                  lot_size=1 if is_us_symbol(code) else 100)
                     d = bt.to_dict()
                     if d['sharpe_ratio'] > best_sharpe and d['total_trades'] > 0:
                         best_sharpe = d['sharpe_ratio']
                         best_name = sn
                 # ensemble 回测
                 ens_func = lambda df: strategy_ensemble(df, min_agree=args.ensemble)
-                bt_ens = backtest(df, ens_func, capital=args.capital, commission=0.001, slippage=0.001, lot_size=100)
+                bt_ens = backtest(df, ens_func, capital=args.capital, commission=0.001, slippage=0.001,
+                                  lot_size=1 if is_us_symbol(code) else 100)
                 d_ens = bt_ens.to_dict()
                 print(f"  {code:<10s} {best_name:>10s} {best_sharpe:>8.2f} {d_ens['total_return']:>+7.2f}% {d_ens['sharpe_ratio']:>8.2f} {d_ens['max_drawdown']:>7.2f}% {d_ens['total_trades']:>5d}")
             except Exception as e:
@@ -1501,10 +1512,25 @@ def cmd_realtime(args):
 
     codes = [c.strip() for c in args.codes.split(',') if c.strip()]
 
-    results = get_realtime(codes, source=args.source)
+    if any(is_us_symbol(code) for code in codes):
+        if not all(is_us_symbol(code) for code in codes):
+            print("  ❌ 实时行情请分别查询 A 股和美股")
+            return
+        if args.source not in ('auto', 'longport'):
+            print("  ❌ 美股实时行情仅支持 LongPort 数据源")
+            return
+        from lib.us_market import get_us_quotes
+        results = get_us_quotes(codes)
+        source = 'longport'
+    else:
+        if args.source == 'longport':
+            print("  ❌ LongPort 数据源目前仅接入美股")
+            return
+        results = get_realtime(codes, source=args.source)
+        source = args.source
 
     print(f"\n{'='*60}")
-    print(f"  📡 实时行情  数据源: {args.source}")
+    print(f"  📡 实时行情  数据源: {source}")
     print(f"{'='*60}")
     print(format_realtime(results))
     print(f"\n{'='*60}")
@@ -2282,11 +2308,12 @@ def cmd_gf_quant(args):
 def main():
     parser = argparse.ArgumentParser(
         prog='quant.py',
-        description='a-stock-data-quant: A股量化分析工具箱',
+        description='a-stock-data-quant: A股/美股量化分析工具箱',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:
   quant.py data sh000001 --count 30
+  quant.py analyze AAPL.US --count 500
   quant.py indicators sh000001 --indicators ma5,ma10,macd,rsi
   quant.py pattern sh000001 --pattern w-bottom,v-reversal
   quant.py backtest sh000001 --strategy ma_cross --capital 100000
@@ -2299,7 +2326,7 @@ def main():
 
     # data
     p_data = subparsers.add_parser('data', help='获取行情数据')
-    p_data.add_argument('code', help='股票代码 (如 sh000001, sz000001)')
+    p_data.add_argument('code', help='股票代码 (如 sh000001, sz000001, AAPL.US)')
     p_data.add_argument('--period', '-p', default='1d', choices=['1d', '1w', '1M', '1m', '5m', '15m', '30m', '60m'], help='K线周期')
     p_data.add_argument('--count', '-n', type=int, default=30, help='数据条数')
     p_data.add_argument('--end', '-e', default='', help='结束日期 (YYYY-MM-DD)')
@@ -2344,7 +2371,7 @@ def main():
 
     # analyze
     p_analyze = subparsers.add_parser('analyze', help='综合分析 (数据+指标+形态+策略+回测)')
-    p_analyze.add_argument('code', help='股票代码 (如 sh000001, sz000001)')
+    p_analyze.add_argument('code', help='股票代码 (如 sh000001, sz000001, AAPL.US)')
     p_analyze.add_argument('--period', '-p', default='1d', choices=['1d', '1w', '1M'], help='K线周期')
     p_analyze.add_argument('--count', '-n', type=int, default=500, help='数据条数')
     p_analyze.add_argument('--end', '-e', default='', help='结束日期 (YYYY-MM-DD)')
@@ -2428,9 +2455,9 @@ def main():
     p_fund.add_argument('--json', '-j', action='store_true', help='JSON格式输出')
 
     # realtime
-    p_rt = subparsers.add_parser('realtime', help='实时行情 (腾讯/东方财富)')
+    p_rt = subparsers.add_parser('realtime', help='实时行情 (A股腾讯/东方财富；美股LongPort)')
     p_rt.add_argument('codes', help='股票代码，逗号分隔 (如 sh600519,sz000858)')
-    p_rt.add_argument('--source', '-s', default='auto', choices=['auto', 'tencent', 'eastmoney'], help='数据源')
+    p_rt.add_argument('--source', '-s', default='auto', choices=['auto', 'tencent', 'eastmoney', 'longport'], help='数据源')
 
     # search
     p_search = subparsers.add_parser('search', help='搜索股票代码/名称')
@@ -2561,6 +2588,13 @@ def main():
     if args.command is None:
         parser.print_help()
         sys.exit(1)
+
+    a_share_only = {
+        'fund', 'diagnose', 'info', 'capital-flow', 'fundamentals',
+        'valuation', 'chip', 'finance', 'report', 'notice', 'interactive',
+    }
+    if args.command in a_share_only and is_us_symbol(args.code):
+        parser.error(f"{args.command} 当前只支持 A 股；美股可用 data、realtime、indicators、pattern、backtest、analyze、compare")
 
     commands = {
         'data': cmd_data,

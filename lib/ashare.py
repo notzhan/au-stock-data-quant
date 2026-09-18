@@ -47,6 +47,9 @@ def get_price_sina(code, end_date='', count=10, frequency='60m'):    #新浪全�
     return df
 
 def get_price(code, end_date='',count=10, frequency='1d', fields=[]):        #对外暴露只有唯一函数，这样对用户才是最友好的
+    from lib.us_market import is_us_symbol, get_us_price
+    if is_us_symbol(code):
+        return get_us_price(code, end_date=end_date, count=count, frequency=frequency)
     xcode= code.replace('.XSHG','').replace('.XSHE','')                      #证券代码编码兼容处理
     xcode='sh'+xcode if ('XSHG' in code)  else  'sz'+xcode  if ('XSHE' in code)  else code
     # 裸6位代码补齐市场前缀（与 realtime_data 一致：5/6/9 开头=上交所，其余=深交所；ETF 510300/518880 等以此识别）

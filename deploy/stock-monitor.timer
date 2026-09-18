@@ -1,0 +1,11 @@
+[Unit]
+Description=Check US stock buy and sell indicators every minute
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=1min
+AccuracySec=10s
+Unit=stock-monitor.service
+
+[Install]
+WantedBy=timers.target

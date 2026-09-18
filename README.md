@@ -3,29 +3,31 @@
 
 <img width="220" alt="logo" src="https://github.com/user-attachments/assets/fe39349c-3a46-4342-bf9a-ec258493270c" />
 
-# A股量化分析工具箱 · A-Share Data Quant
+# A股/美股量化分析工具箱 · AU Stock Data Quant
 
 **20+ 技术指标 · 7 种回测策略 · 多源自动降级 · 港股/期货/期权/宏观 · 东方财富妙想 AI · 同花顺 iFinD · 广发 MCP · F10 财务 · 研报/公告/互动易**
 
 <br>
 
-[![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![Version](https://img.shields.io/badge/Version-v3.8.1-ff69b4?style=for-the-badge)](https://github.com/jangviktor-web/a-stock-data-quant/releases)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Version](https://img.shields.io/badge/Version-v3.8.1-ff69b4?style=for-the-badge)](https://github.com/notzhan/au-stock-data-quant)
 [![License](https://img.shields.io/badge/License-MIT--0-green?style=for-the-badge)](https://opensource.org/licenses/MIT-0)
-[![A-Share](https://img.shields.io/badge/A股-量化分析-red?style=for-the-badge)](https://github.com/jangviktor-web/a-stock-data-quant)
+[![A-Share](https://img.shields.io/badge/A股-量化分析-red?style=for-the-badge)](https://github.com/notzhan/au-stock-data-quant)
 
 <br>
 
-[![SkillHub](https://img.shields.io/badge/SkillHub-Published-purple?style=flat-square&logo=datacamp)](https://skillhub.cn/skills/astockdataquant)
-[![ClawHub](https://img.shields.io/badge/ClawHub-Published-blue?style=flat-square&logo=datacamp)](https://clawhub.ai/plugins/a-stock-data-quant)
+[![Upstream SkillHub](https://img.shields.io/badge/原项目-SkillHub-purple?style=flat-square&logo=datacamp)](https://skillhub.cn/skills/astockdataquant)
+[![Upstream ClawHub](https://img.shields.io/badge/原项目-ClawHub-blue?style=flat-square&logo=datacamp)](https://clawhub.ai/plugins/a-stock-data-quant)
 [![Claude](https://img.shields.io/badge/Claude_Code-Plugin-orange?style=flat-square&logo=anthropic)](https://claude.ai/settings/plugins/submit)
-[![GitHub Stars](https://img.shields.io/github/stars/jangviktor-web/a-stock-data-quant?style=flat-square&color=blue)](https://github.com/jangviktor-web/a-stock-data-quant/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/notzhan/au-stock-data-quant?style=flat-square&color=blue)](https://github.com/notzhan/au-stock-data-quant/stargazers)
 
 <br>
 
 基于 [akshare](https://github.com/akfamily/akshare) + [MyTT](https://github.com/mpquant/MyTT) + [Ashare](https://github.com/mpquant/Ashare) 构建
 
-数据源: akshare · 百度财经 · 通达信 · 东财数据中心 · 同花顺 · 腾讯 · 华尔街见闻 · 巨潮资讯 · 广发MCP
+本仓库基于 [原项目](https://github.com/jangviktor-web/a-stock-data-quant) 扩展美股 LongPort 行情与 Bark 盘中监控。
+
+数据源: LongPort · akshare · 百度财经 · 通达信 · 东财数据中心 · 同花顺 · 腾讯 · 华尔街见闻 · 巨潮资讯 · 广发MCP
 
 </div>
 
@@ -33,7 +35,7 @@
 
 ### 一句话介绍
 
-把 A股/港股行情、技术指标、量化回测、AI 金融分析、筹码分布、板块资金流、F10 财务、研报公告，打包成一个可被 AI Agent 直接调用的技能——**自然语言提问即可，无需记命令**。
+把 A股/美股/港股行情、技术指标、量化回测、盘中监控、AI 金融分析、筹码分布、板块资金流、F10 财务、研报公告，打包成一个可被 AI Agent 直接调用的技能——**自然语言提问即可，无需记命令**。
 
 **直接提问词**：`茅台现在什么价？` / `分析 300750 技术面` / `今天大盘怎么样` / `沪深300ETF该不该买` / `宁德时代资金流`
 
@@ -67,7 +69,9 @@
 ## 🚀 快速安装
 
 <details open>
-<summary><b> SkillHub（推荐）</b></summary>
+<summary><b>原项目 SkillHub</b></summary>
+
+以下安装入口由原项目发布。使用本 fork 的美股和盘中监控功能，请按下方“直接克隆”安装。
 
 ```bash
 # 请根据 https://skillhub.cn/install/skillhub.md，安装 @user_ff4d9420/astockdataquant
@@ -76,7 +80,7 @@
 </details>
 
 <details>
-<summary><b>ClawHub（推荐）</b></summary>
+<summary><b>原项目 ClawHub</b></summary>
 
 ```bash
 # 请根据下方命令安装 skill
@@ -89,8 +93,8 @@ openclaw skills install @jangviktor-web/a-stock-data-quant
 <summary><b>直接克隆（命令行使用）</b></summary>
 
 ```bash
-git clone https://github.com/jangviktor-web/a-stock-data-quant.git
-cd a-stock-data-quant
+git clone https://github.com/notzhan/au-stock-data-quant.git
+cd au-stock-data-quant
 pip install -r requirements.txt
 ```
 
@@ -103,6 +107,8 @@ pip install -r requirements.txt
 | 能力 | 覆盖范围 | 说明 |
 |:---|:---:|:---|
 | 行情数据 | ✅ | A股/港股实时+历史K线，腾讯→东财→mootdx 三级自动降级 |
+| 美股量化 | ✅ | LongPort 只读行情；K线、指标、形态、策略回测、综合分析与多股对比 |
+| 美股盘中监控 | ✅ | 多股 5 分钟 K 买卖指标、Bark 等通知、systemd 定时器与去重 |
 | 技术指标 | ✅ | MA/MACD/RSI/KDJ/BOLL/CCI/ATR/OBV 等 20+ 指标 |
 | 形态识别 | ✅ | W底 / 杯柄 / 三重底 / V型反转 / 回踩 / Zigzag |
 | 策略回测 | ✅ | 7 种策略（buy_hold/ma_cross/macd/rsi/boll/kdj/ensemble）+ HTML 图表 |
@@ -119,6 +125,74 @@ pip install -r requirements.txt
 ---
 
 ## 💡 使用示例
+
+### 美股行情与量化分析
+
+美股使用 LongPort OpenAPI，支持 `AAPL` 或 `AAPL.US` 格式。先安装依赖，再配置 `LONGPORT_APP_KEY`、`LONGPORT_APP_SECRET`、`LONGPORT_ACCESS_TOKEN`。复制仓库根目录的 `.env.example` 为 `.env`，填入自己的凭证；`.env` 已被 Git 忽略。还需开通相应美股行情权限。取得凭证后可运行下方命令。
+
+```bash
+cp .env.example .env
+chmod 600 .env
+# 编辑 .env，填入 LongPort 凭证和需要的通知渠道
+```
+
+```bash
+pip install -r requirements.txt
+python bin/quant.py realtime AAPL.US,MSFT.US
+python bin/quant.py data AAPL.US --period 1d --count 120
+python bin/quant.py indicators AAPL.US --count 120
+python bin/quant.py analyze AAPL.US --count 500
+python bin/quant.py backtest AAPL.US --strategy ma_cross --count 500
+python bin/quant.py compare AAPL.US,MSFT.US
+python bin/quant.py data AAPL.US --end 2025-12-31 --count 30
+```
+
+美股 K 线按美东交易时区呈现，默认取常规交易时段并使用前复权；单次最多 1000 条。回测按美元与 1 股交易单位计算，手续费和滑点仍为模型假设。A 股专属的资金流、F10、筹码、公告等命令不适用于美股。
+
+### 美股盘中买卖信号监控服务
+
+完整步骤见 [美股盘中监控部署与配置](docs/monitor-deployment.md)。
+
+`bin/monitor.py` 可监控一只或多只美股，默认 `intraday`：美东常规交易时段内，每分钟扫描已完成的 5 分钟 K 线。EMA9 上穿 EMA21 且收盘价高于当日 VWAP 时发买入提醒；EMA9 下穿 EMA21 且收盘价低于当日 VWAP 时发卖出指标提醒。首次可能在美东 09:35 后触发，16:00 起不再发盘中提醒；跳过尚未完成、超过 3 分钟的旧 K 线和盘前/盘后数据。每只股票、每根信号 K 线只通知一次。`MONITOR_SIDES=buy,sell` 可选择提醒方向。`--strategy ensemble` 等旧策略仍可用于收盘后的日线提醒。
+
+这套盘中规则是可配置的技术提醒，尚未验证长期收益，不能据此推断能实现 5% 的 T。
+
+```bash
+# 先查看当前盘中信号：不发送通知，也不写入已通知状态
+.venv/bin/python bin/monitor.py --symbols MU.US,MRVL.US,SKHY.US,DRAM.US --dry-run
+
+# 如需旧版收盘日线信号，可显式指定策略
+.venv/bin/python bin/monitor.py --symbols MU.US,MRVL.US --strategy ensemble --dry-run
+```
+
+持续通知时，在项目根目录的 `.env` 中保留 LongPort 三项凭证，并加上监控配置及**一种**通知渠道。文件应仅对自己可读，例如 `chmod 600 .env`。
+
+```dotenv
+MONITOR_SYMBOLS=MU.US,MRVL.US,SKHY.US,DRAM.US
+MONITOR_STRATEGY=intraday
+MONITOR_SIDES=buy,sell
+MONITOR_CHANNEL=bark
+BARK_URL=https://api.day.app/你的设备密钥
+```
+
+其他渠道：钉钉用 `MONITOR_CHANNEL=dingtalk` + `DINGTALK_WEBHOOK_QUANT`；Telegram 用 `MONITOR_CHANNEL=telegram` + `TELEGRAM_BOT_TOKEN`、`TELEGRAM_CHAT_ID`；邮件用 `MONITOR_CHANNEL=email` + `SMTP_HOST`、`SMTP_USER`、`SMTP_PASSWORD`、`ALERT_EMAIL_TO`，可选 `SMTP_PORT`（默认 465）和 `ALERT_EMAIL_FROM`。钉钉若设置了关键字，需允许通知标题中的“买入信号”。
+
+Bark 用 `MONITOR_CHANNEL=bark` + `BARK_URL=https://api.day.app/你的设备密钥`。可用 `bin/monitor.py --test-notification` 发送一条明确标记为测试的消息；Bark 的 [官方文档](https://github.com/Finb/Bark/blob/master/docs/en-us/tutorial.md) 支持将设备密钥放入 JSON 请求体。设备地址只放在 Git 忽略的 `.env` 中。
+
+```bash
+.venv/bin/python bin/monitor.py --check-config  # 只核对配置，不联网或发送
+bash deploy/install-user-service.sh             # 安装并启动用户级 systemd 定时器
+systemctl --user status stock-monitor.timer
+journalctl --user -u stock-monitor.service -n 30
+```
+
+定时器在上一轮结束约 1 分钟后运行下一轮；非交易时段会跳过盘中信号。修改 `.env` 后下一轮自动读取；修改服务模板后重新运行安装脚本。停止监控：`systemctl --user disable --now stock-monitor.timer`。如需用户登出后继续运行，主机须允许该用户的 systemd linger。通知是技术信号，不是自动下单，也不代表达到特定盈利目标。
+
+当前默认监控名单可在 `.env` 的 `MONITOR_SYMBOLS` 中修改。盘中策略至少需要 30 根常规时段 5 分钟 K；旧日线策略至少需要 40 根日 K。
+
+### 作为 Codex Skill 使用
+
+本仓库的 `.agents/skills/a-stock-data-quant` 指向根目录的 `SKILL.md`，在此仓库启动 Codex 后可输入 `$a-stock-data-quant` 显式调用，也可以直接用自然语言提问，例如“用 a-stock-data-quant 分析 AAPL.US 最近一年的趋势和回测”。如果技能列表尚未显示，重新打开 Codex 会话。美股行情读取项目根目录 `.env` 中的 LongPort 凭证；A 股专属数据仍只用于 A 股。
 
 **查行情**
 
@@ -167,8 +241,8 @@ pip install -r requirements.txt
 
 **第 2 步：下载并安装依赖**
 ```bash
-git clone https://github.com/jangviktor-web/a-stock-data-quant.git
-cd a-stock-data-quant
+git clone https://github.com/notzhan/au-stock-data-quant.git
+cd au-stock-data-quant
 pip install -r requirements.txt
 ```
 
@@ -214,15 +288,13 @@ python bin/quant.py realtime 600519
 ### 安装
 
 ```bash
-# SkillHub（推荐）：请根据 https://skillhub.cn/install/skillhub.md，安装 @user_ff4d9420/astockdataquant
-# ClawHub（推荐）：openclaw skills install @jangviktor-web/a-stock-data-quant
-
-# 或直接克隆：
-git clone https://github.com/jangviktor-web/a-stock-data-quant.git
-cd a-stock-data-quant
+# 本 fork（含美股行情和盘中监控）直接克隆：
+git clone https://github.com/notzhan/au-stock-data-quant.git
+cd au-stock-data-quant
 pip install -r requirements.txt
-安装skill。
 ```
+
+SkillHub/ClawHub 入口由[原项目](https://github.com/jangviktor-web/a-stock-data-quant)发布，版本可能与此 fork 不同。
 
 ### 常用命令
 
@@ -792,28 +864,9 @@ def get_fund_flow(code, market=None):
 
 ## ⚙️ 配置管理
 
-```yaml
-# config.yaml — 复制 config.yaml.example 后填入
+**凭证与监控参数**放在 Git 忽略的 `.env` 中，从 [.env.example](.env.example) 复制。LongPort 使用 `LONGPORT_APP_KEY`、`LONGPORT_APP_SECRET`、`LONGPORT_ACCESS_TOKEN`；盘中监控使用 `MONITOR_SYMBOLS`、`MONITOR_STRATEGY=intraday`、`MONITOR_SIDES=buy,sell`。Bark 通知使用 `MONITOR_CHANNEL=bark` 和 `BARK_URL`。完整步骤见 [部署与配置文档](docs/monitor-deployment.md)。
 
-# 东方财富妙想 AI (免费，随包内置默认 Key，可在此覆盖)
-em_api_key: "em_xxxxxxxxxxxxxxxx"
-
-# 同花顺 hithink-finance API Key (可选，配置时优先)
-hithink_finance_api_key: "your-hithink-key"
-
-# 广发MCP数据 API Key
-gf_api_key: "your-gf-api-key"
-
-# 回测参数
-capital: 100000        # 初始资金
-commission: 0.001      # 手续费率
-slippage: 0.001        # 滑点
-
-# 数据缓存
-cache:
-  enabled: true
-  ttl_hours: 4
-```
+东方财富、同花顺、广发的自有凭证可分别通过 `EM_API_KEY`、`HITHINK_FINANCE_API_KEY`、`GF_SKILLS_APIKEY` 环境变量提供。仓库跟踪的 `config.yaml` 用于回测资金、手续费、数据缓存等普通参数；请勿向其中写入自己的明文密钥。
 
 ```bash
 python bin/quant.py cache stats         # 查看缓存统计

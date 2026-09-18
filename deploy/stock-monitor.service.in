@@ -1,0 +1,12 @@
+[Unit]
+Description=US stock intraday buy and sell indicator monitor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=@REPO@
+Environment=MONITOR_SYMBOLS=MU.US
+Environment=MONITOR_STRATEGY=intraday
+EnvironmentFile=-@REPO@/.env
+ExecStart=@PYTHON@ @REPO@/bin/monitor.py --symbols ${MONITOR_SYMBOLS} --strategy ${MONITOR_STRATEGY} --channel ${MONITOR_CHANNEL}

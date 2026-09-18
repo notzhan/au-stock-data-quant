@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from lib.ashare import get_price
 from lib import mytt
+from lib.us_market import is_us_symbol
 
 # ── 检查依赖 ──────────────────────────────────────────
 
@@ -228,6 +229,14 @@ def analyze_news(stock_name=""):
 
 def full_analysis(code, name=""):
     """四维综合分析"""
+    if is_us_symbol(code):
+        # 资金/板块评分依赖 A 股数据，改用跨市场技术分析与回测。
+        from types import SimpleNamespace
+        from bin.quant import cmd_analyze
+        return cmd_analyze(SimpleNamespace(
+            code=code, count=500, period='1d', end='', capital=100000,
+            stop_loss=None, take_profit=None, html=False,
+        ))
     if not name:
         name = code
 

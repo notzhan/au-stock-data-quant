@@ -393,11 +393,12 @@ def format_realtime(results):
 
         vol_str = ''
         vol = r.get('volume', 0)
+        vol_unit = r.get('volume_unit', '手')
         if vol:
             if vol >= 10000:
-                vol_str = f"  量:{vol/10000:.0f}万手"
+                vol_str = f"  量:{vol/10000:.0f}万{vol_unit}"
             else:
-                vol_str = f"  量:{vol:.0f}手"
+                vol_str = f"  量:{vol:.0f}{vol_unit}"
 
         amt_str = ''
         amt = r.get('amount', 0)
