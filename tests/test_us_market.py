@@ -1,19 +1,50 @@
 import sys
+import os
+import tempfile
 import types
 import unittest
 from contextlib import redirect_stdout
 from datetime import datetime, timezone
 from io import StringIO
+from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
 
 from lib import us_market
+from lib.env_file import load_env_file
 from lib.ashare import get_price
 
 
 class USMarketTests(unittest.TestCase):
+    def test_mixed_realtime_routes_each_market(self):
+        from bin import quant
+
+        args = types.SimpleNamespace(codes='600519,MU', source='auto')
+        cn_quote = {'code': 'SH600519', 'name': '贵州茅台', 'now': 1500, 'percent': 1}
+        us_quote = {'code': 'MU.US', 'name': 'MU.US', 'now': 100, 'percent': 2}
+        output = StringIO()
+        with patch.object(quant, 'get_realtime', return_value=[cn_quote]) as cn_fetch, \
+             patch('lib.us_market.get_us_quotes', return_value=[us_quote]) as us_fetch, \
+             redirect_stdout(output):
+            quant.cmd_realtime(args)
+        cn_fetch.assert_called_once_with(['600519'], source='auto')
+        us_fetch.assert_called_once_with(['MU'])
+        self.assertIn('贵州茅台', output.getvalue())
+        self.assertIn('MU.US', output.getvalue())
+
+    def test_local_env_loader_only_reads_supported_keys(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / '.env'
+            path.write_text('LONGPORT_APP_KEY="test-key"\nUNRELATED_KEY=ignored\n', encoding='utf-8')
+            with patch.dict(os.environ, {'LONGPORT_APP_KEY': ''}, clear=False):
+                os.environ.pop('LONGPORT_APP_KEY')
+                os.environ.pop('UNRELATED_KEY', None)
+                load_env_file(path)
+                self.assertEqual(os.environ['LONGPORT_APP_KEY'], 'test-key')
+                self.assertNotIn('UNRELATED_KEY', os.environ)
+
     def test_symbol_routing(self):
         self.assertEqual(us_market.normalize_us_symbol('aapl'), 'AAPL.US')
         self.assertEqual(us_market.normalize_us_symbol('BRK.B.US'), 'BRK.B.US')

@@ -1505,29 +1505,29 @@ def cmd_fundamentals(args):
 
 
 def cmd_realtime(args):
-    """实时行情 — 腾讯/东方财富多数据源"""
+    """实时行情 — A 股与美股按市场分别查询"""
     if not HAS_REALTIME:
         print("  ❌ realtime_data 模块未加载")
         return
 
     codes = [c.strip() for c in args.codes.split(',') if c.strip()]
 
-    if any(is_us_symbol(code) for code in codes):
-        if not all(is_us_symbol(code) for code in codes):
-            print("  ❌ 实时行情请分别查询 A 股和美股")
-            return
-        if args.source not in ('auto', 'longport'):
-            print("  ❌ 美股实时行情仅支持 LongPort 数据源")
-            return
+    cn_codes = [code for code in codes if not is_us_symbol(code)]
+    us_codes = [code for code in codes if is_us_symbol(code)]
+    if us_codes and args.source not in ('auto', 'longport'):
+        print("  ❌ 美股实时行情仅支持 LongPort 数据源")
+        return
+    if cn_codes and args.source == 'longport':
+        print("  ❌ LongPort 数据源目前仅接入美股")
+        return
+
+    results = get_realtime(cn_codes, source=args.source) if cn_codes else []
+    if us_codes:
         from lib.us_market import get_us_quotes
-        results = get_us_quotes(codes)
-        source = 'longport'
-    else:
-        if args.source == 'longport':
-            print("  ❌ LongPort 数据源目前仅接入美股")
-            return
-        results = get_realtime(codes, source=args.source)
-        source = args.source
+        results += get_us_quotes(us_codes)
+    source = f'{args.source}(A股) + longport(美股)' if cn_codes and us_codes else (
+        'longport' if us_codes else args.source
+    )
 
     print(f"\n{'='*60}")
     print(f"  📡 实时行情  数据源: {source}")
@@ -2456,7 +2456,7 @@ def main():
 
     # realtime
     p_rt = subparsers.add_parser('realtime', help='实时行情 (A股腾讯/东方财富；美股LongPort)')
-    p_rt.add_argument('codes', help='股票代码，逗号分隔 (如 sh600519,sz000858)')
+    p_rt.add_argument('codes', help='股票代码，逗号分隔 (如 600519,MU)')
     p_rt.add_argument('--source', '-s', default='auto', choices=['auto', 'tencent', 'eastmoney', 'longport'], help='数据源')
 
     # search

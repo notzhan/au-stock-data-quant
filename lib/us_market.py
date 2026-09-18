@@ -2,8 +2,10 @@
 
 import re
 from datetime import datetime, time
+from pathlib import Path
 
 import pandas as pd
+from lib.env_file import load_env_file
 
 
 _US_SYMBOL = re.compile(r"^[A-Z][A-Z0-9]*(?:[.-][A-Z0-9]+)*$")
@@ -27,6 +29,7 @@ def normalize_us_symbol(code):
 
 
 def _quote_context():
+    load_env_file(Path(__file__).resolve().parent.parent / '.env')
     try:
         from longport.openapi import Config, QuoteContext
     except ImportError as exc:

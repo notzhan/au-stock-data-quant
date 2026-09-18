@@ -139,6 +139,7 @@ chmod 600 .env
 ```bash
 pip install -r requirements.txt
 python bin/quant.py realtime AAPL.US,MSFT.US
+python bin/quant.py realtime 600519,MU    # A 股和美股可混合查询
 python bin/quant.py data AAPL.US --period 1d --count 120
 python bin/quant.py indicators AAPL.US --count 120
 python bin/quant.py analyze AAPL.US --count 500
@@ -148,6 +149,7 @@ python bin/quant.py data AAPL.US --end 2025-12-31 --count 30
 ```
 
 美股 K 线按美东交易时区呈现，默认取常规交易时段并使用前复权；单次最多 1000 条。回测按美元与 1 股交易单位计算，手续费和滑点仍为模型假设。A 股专属的资金流、F10、筹码、公告等命令不适用于美股。
+LongPort 行情查询会读取项目根目录的 `.env`；已设置的同名环境变量优先。
 
 ### 美股盘中买卖信号监控服务
 
